@@ -21,9 +21,6 @@ class App(object):
         files = self.directoryHandler.media_files(self.src)
         for file in files:
             print(file, ' ---> ', file.new_name())
-
-            # find date name
-            # if found, move to new name
             # new_path = shutil.move(source, destination)
 
     def setDirectoryProvider(self, provider):
