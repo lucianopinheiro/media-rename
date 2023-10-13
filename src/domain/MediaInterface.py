@@ -12,7 +12,7 @@ class Media:
         self.path = os.path.dirname(filename)
         self.original_name = os.path.basename(filename)
 
-    def find_datetime():
+    def find_datetime(self):
         """Abstract method"""
         pass
 
