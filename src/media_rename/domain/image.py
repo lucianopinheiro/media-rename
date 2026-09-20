@@ -21,7 +21,7 @@ class Image(Media):
     def __str__(self) -> str:
         return "image: " + self.original_name
 
-    def _build_chain(self, enable_mtime: bool = False):
+    def _build_chain(self, enable_mtime: bool = False) -> StandardNameStrategy:
         """Assemble the Chain of Responsibility for resolving the date.
 
         Order of precedence: the standardized output name (so already-renamed
@@ -37,10 +37,3 @@ class Image(Media):
             UnixTimestampStrategy(self.EXTENSIONS)
         ).set_next(FileMtimeStrategy(enabled=enable_mtime))
         return chain
-
-    def find_datetime(self) -> None:
-        result = self._chain.handle(self)
-        if result is not None:
-            self.date = result.date
-            self.extension = result.extension
-            self.found = True

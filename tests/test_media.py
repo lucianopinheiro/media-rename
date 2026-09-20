@@ -4,21 +4,31 @@ import datetime
 
 from media_rename.domain.image import Image
 from media_rename.domain.media_interface import Media
+from media_rename.domain.strategies.date_strategy import DateResult
 from media_rename.domain.video import Video
 
 
-def test_new_name_formats_standard_pattern():
-    media = Media("/some/dir/whatever.jpg")
-    media.found = True
-    media.date = datetime.datetime(2022, 10, 10, 10, 37, 18)
-    media.extension = "jpg"
+class _ResolvedMedia(Media):
+    """Media whose ``find_datetime`` returns a preset result."""
 
+    def __init__(self, filename, result):
+        super().__init__(filename)
+        self._result = result
+
+    def find_datetime(self):
+        return self._result
+
+
+def test_new_name_formats_standard_pattern():
+    result = DateResult(datetime.datetime(2022, 10, 10, 10, 37, 18), "jpg")
+    media = _ResolvedMedia("/some/dir/whatever.jpg", result)
     assert media.new_name() == "2022-10-10 10.37.18.jpg"
 
 
 def test_new_name_returns_none_when_no_date_found():
+    # The base Media has no chain, so it resolves nothing.
     media = Media("/some/dir/whatever.jpg")
-    # find_datetime on the base class resolves nothing.
+    assert media.find_datetime() is None
     assert media.new_name() is None
 
 

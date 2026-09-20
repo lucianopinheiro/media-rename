@@ -5,20 +5,19 @@ import os
 
 from media_rename.app import App
 from media_rename.domain.media_interface import Media
+from media_rename.domain.strategies.date_strategy import DateResult
 
 
 class FakeMedia(Media):
-    """A Media whose date is set directly, bypassing the strategy chain."""
+    """A Media whose date resolution is preset, bypassing the strategy chain."""
 
     def __init__(self, filename, date, extension):
         super().__init__(filename)
         self.type = "image"
-        self.date = date
-        self.extension = extension
-        self.found = date is not None
+        self._result = DateResult(date, extension) if date is not None else None
 
-    def find_datetime(self):  # pragma: no cover - date is preset
-        pass
+    def find_datetime(self):
+        return self._result
 
     def __str__(self):
         return f"image: {self.original_name}"
@@ -117,9 +116,7 @@ def test_rename_renames_file_on_disk(tmp_path):
     original.write_text("data")
 
     app = App("ignored")
-    app.set_directory_provider(
-        FakeProvider([FakeMedia(str(original), DATE, "jpg")])
-    )
+    app.set_directory_provider(FakeProvider([FakeMedia(str(original), DATE, "jpg")]))
     app.rename()
 
     assert not original.exists()
@@ -131,9 +128,7 @@ def test_rename_dry_run_leaves_files_untouched(tmp_path):
     original.write_text("data")
 
     app = App("ignored")
-    app.set_directory_provider(
-        FakeProvider([FakeMedia(str(original), DATE, "jpg")])
-    )
+    app.set_directory_provider(FakeProvider([FakeMedia(str(original), DATE, "jpg")]))
     app.rename(dry_run=True)
 
     assert original.exists()
@@ -145,9 +140,7 @@ def test_rename_skips_file_without_date(tmp_path):
     original.write_text("data")
 
     app = App("ignored")
-    app.set_directory_provider(
-        FakeProvider([FakeMedia(str(original), None, "jpg")])
-    )
+    app.set_directory_provider(FakeProvider([FakeMedia(str(original), None, "jpg")]))
     app.rename()
 
     # Left untouched because no date could be resolved.
@@ -159,9 +152,7 @@ def test_rename_is_idempotent_on_already_named(tmp_path):
     already.write_text("data")
 
     app = App("ignored")
-    app.set_directory_provider(
-        FakeProvider([FakeMedia(str(already), DATE, "jpg")])
-    )
+    app.set_directory_provider(FakeProvider([FakeMedia(str(already), DATE, "jpg")]))
     app.rename()
 
     # Still there under the same name, nothing bumped.

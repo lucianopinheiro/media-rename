@@ -20,7 +20,7 @@ class Video(Media):
     def __str__(self) -> str:
         return "video: " + self.original_name
 
-    def _build_chain(self, enable_mtime: bool = False):
+    def _build_chain(self, enable_mtime: bool = False) -> StandardNameStrategy:
         """Assemble the Chain of Responsibility for resolving the date.
 
         Videos have no EXIF, so the chain relies on filename patterns: first the
@@ -36,10 +36,3 @@ class Video(Media):
             FileMtimeStrategy(enabled=enable_mtime)
         )
         return chain
-
-    def find_datetime(self) -> None:
-        result = self._chain.handle(self)
-        if result is not None:
-            self.date = result.date
-            self.extension = result.extension
-            self.found = True
