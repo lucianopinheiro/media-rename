@@ -36,9 +36,11 @@ class UnixTimestampStrategy(DateStrategy):
 
         digits, extension = match.groups()
         epoch = int(digits)
-        # 13-digit values are milliseconds since the epoch.
+        # 13-digit values are milliseconds since the epoch. Use integer
+        # division to drop the sub-second remainder so the resulting datetime
+        # is second-resolution, consistent with the other strategies.
         if len(digits) == 13:
-            epoch = epoch / 1000
+            epoch = epoch // 1000
 
         try:
             # Unix timestamps are UTC-based; interpret them as UTC. Drop the
