@@ -53,9 +53,15 @@ Linting and formatting use [ruff](https://docs.astral.sh/ruff/) (configured in
 `pyproject.toml`, targeting Python 3.12):
 
 ```bash
-pip install -e ".[dev]"     # installs ruff
+pip install -e ".[dev]"     # installs ruff + pytest
 ruff check src/             # lint
 ruff check --fix src/       # lint and auto-fix
+```
+
+Tests use [pytest](https://docs.pytest.org/) and live in `tests/`:
+
+```bash
+pytest                      # run the suite
 ```
 
 ## Run

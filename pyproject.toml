@@ -13,7 +13,7 @@ dependencies = [
 # Richer video detection via libmediainfo (requires the native library).
 video = ["pymediainfo>=6.0"]
 # Tooling for development.
-dev = ["ruff>=0.6"]
+dev = ["ruff>=0.6", "pytest>=8.0"]
 
 # Console entry point: after `pip install -e .` this exposes a `media-rename`
 # command that runs `app.main` from any working directory.
@@ -37,3 +37,9 @@ src = ["src"]
 # A sensible default set: pycodestyle (E/W), pyflakes (F), isort (I),
 # flake8-bugbear (B), pyupgrade (UP).
 select = ["E", "W", "F", "I", "B", "UP"]
+
+[tool.pytest.ini_options]
+# Make the package under ``src/`` importable without an install, and keep test
+# discovery scoped to the ``tests/`` directory.
+pythonpath = ["src"]
+testpaths = ["tests"]
