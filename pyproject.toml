@@ -1,0 +1,26 @@
+[project]
+name = "media-rename"
+version = "0.1.0"
+description = "Rename media (image or video) to a standard, sortable name based on capture date/time."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { file = "LICENSE" }
+dependencies = [
+    "Pillow>=10.0",
+]
+
+[project.optional-dependencies]
+# Richer video detection via libmediainfo (requires the native library).
+video = ["pymediainfo>=6.0"]
+# Tooling for development.
+dev = ["ruff>=0.6"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+src = ["src"]
+
+[tool.ruff.lint]
+# A sensible default set: pycodestyle (E/W), pyflakes (F), isort (I),
+# flake8-bugbear (B), pyupgrade (UP).
+select = ["E", "W", "F", "I", "B", "UP"]

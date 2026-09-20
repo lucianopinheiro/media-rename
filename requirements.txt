@@ -1,0 +1,15 @@
+# Core runtime dependencies for media-rename
+#
+# Install into a virtual environment:
+#   python3 -m venv .venv
+#   source .venv/bin/activate
+#   pip install -r requirements.txt
+
+# Reading EXIF metadata from images (ExifDateStrategy).
+Pillow>=10.0
+
+# Optional: richer video detection via libmediainfo.
+# Requires the native "libmediainfo" library to be installed on the system
+# (e.g. `sudo apt install mediainfo`). The app degrades gracefully to an
+# extension-based check if this is missing, so it is listed as optional below.
+# pymediainfo>=6.0

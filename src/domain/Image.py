@@ -1,44 +1,46 @@
 from .MediaInterface import Media
-import re
-import datetime
+from .strategies import (
+    ExifDateStrategy,
+    FileMtimeStrategy,
+    FilenameTimestampStrategy,
+    PrefixedFilenameStrategy,
+    StandardNameStrategy,
+    UnixTimestampStrategy,
+)
 
 
 class Image(Media):
+    # Accepted image extensions as a regex alternation fragment.
+    EXTENSIONS = r"jp[e]?g|png|gif"
 
-    def __init__(self, filename):
+    def __init__(self, filename, enable_mtime: bool = False):
         super().__init__(filename)
-        self.type = 'image'
+        self.type = "image"
+        self._chain = self._build_chain(enable_mtime)
 
     def __str__(self) -> str:
         return "image: " + self.original_name
 
-    def find_datetime(self) -> str:
-        techniques = [self.find_datetime_from_filename]
-        for method in techniques:
-            date = method(self.original_name)
-            if date:
-                self.date = date[0]
-                self.extension = date[1]
-                self.found = True
-                break
+    def _build_chain(self, enable_mtime: bool = False):
+        """Assemble the Chain of Responsibility for resolving the date.
 
-    def find_datetime_from_filename(self, filename) -> datetime.datetime:
-        """New name based on pattern yyyymmdd_hhMMss.jpg
-            - 20211228_100341.jpg
-
-        Returns:
-            str: new name
+        Order of precedence: the standardized output name (so already-renamed
+        files are recognized), then EXIF metadata, then a plain
+        ``yyyymmdd_hhMMss`` filename, then a prefixed ``IMG_yyyymmdd_hhMMss``
+        filename, then a Unix timestamp filename. The file-mtime fallback is
+        wired in last but disabled by default.
         """
+        chain = StandardNameStrategy(self.EXTENSIONS)
+        chain.set_next(ExifDateStrategy()).set_next(
+            FilenameTimestampStrategy(self.EXTENSIONS)
+        ).set_next(PrefixedFilenameStrategy(self.EXTENSIONS)).set_next(
+            UnixTimestampStrategy(self.EXTENSIONS)
+        ).set_next(FileMtimeStrategy(enabled=enable_mtime))
+        return chain
 
-        expression = '(\d{8})_(\d{6})\.(jp[e]?g)$'
-        r = re.compile(expression)
-        if r.match(filename) is not None:
-            found = re.search(expression, filename)
-            y = int(found.group(1)[0:4])
-            m = int(found.group(1)[4:6])
-            d = int(found.group(1)[6:8])
-            h = int(found.group(2)[0:2])
-            min = int(found.group(2)[2:4])
-            s = int(found.group(2)[4:6])
-            extension = found.group(3)
-            return [datetime.datetime(y, m, d, h, min, s), extension]
+    def find_datetime(self) -> None:
+        result = self._chain.handle(self)
+        if result is not None:
+            self.date = result.date
+            self.extension = result.extension
+            self.found = True

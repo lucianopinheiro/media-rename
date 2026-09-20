@@ -1,13 +1,11 @@
-import datetime
 import os
 
 
 class Media:
-
     def __init__(self, filename) -> None:
-        self.type = ''  # video,image
+        self.type = ""  # video,image
         self.date = None
-        self.extension = ''
+        self.extension = ""
         self.found = False
         self.path = os.path.dirname(filename)
         self.original_name = os.path.basename(filename)
@@ -21,4 +19,8 @@ class Media:
             self.find_datetime()
 
         if self.found:
-            return datetime.datetime.strftime(self.date, "%Y-%m-%d_%H.%M.%S."+self.extension)
+            return self.date.strftime("%Y-%m-%d %H.%M.%S." + self.extension)
+
+    def source_path(self) -> str:
+        """Absolute/relative path to the current file on disk."""
+        return os.path.join(self.path, self.original_name)

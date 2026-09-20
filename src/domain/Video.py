@@ -1,44 +1,45 @@
 from .MediaInterface import Media
-import re
-import datetime
+from .strategies import (
+    FileMtimeStrategy,
+    FilenameTimestampStrategy,
+    PrefixedFilenameStrategy,
+    StandardNameStrategy,
+    UnixTimestampStrategy,
+)
 
 
 class Video(Media):
+    # Accepted video extensions as a regex alternation fragment.
+    EXTENSIONS = r"mp[e]?g|mp4|3gp"
 
-    def __init__(self, filename):
+    def __init__(self, filename, enable_mtime: bool = False):
         super().__init__(filename)
-        self.type = 'video'
+        self.type = "video"
+        self._chain = self._build_chain(enable_mtime)
 
     def __str__(self) -> str:
         return "video: " + self.original_name
 
-    def find_datetime(self) -> str:
-        techniques = [self.find_datetime_from_filename]
-        for method in techniques:
-            date = method(self.original_name)
-            if date:
-                self.date = date[0]
-                self.extension = date[1]
-                self.found = True
-                break
+    def _build_chain(self, enable_mtime: bool = False):
+        """Assemble the Chain of Responsibility for resolving the date.
 
-    def find_datetime_from_filename(self, filename) -> datetime.datetime:
-        """New name based on pattern yyyymmdd_hhMMss.mpeg
-            - 20211228_100341.mp4
-
-        Returns:
-            str: new name
+        Videos have no EXIF, so the chain relies on filename patterns: first the
+        standardized output name (so already-renamed files are recognized), then
+        a plain ``yyyymmdd_hhMMss`` name, then a prefixed ``VID_yyyymmdd_hhMMss``
+        name, then a Unix timestamp name. The file-mtime fallback is wired in
+        last but disabled by default.
         """
+        chain = StandardNameStrategy(self.EXTENSIONS)
+        chain.set_next(FilenameTimestampStrategy(self.EXTENSIONS)).set_next(
+            PrefixedFilenameStrategy(self.EXTENSIONS)
+        ).set_next(UnixTimestampStrategy(self.EXTENSIONS)).set_next(
+            FileMtimeStrategy(enabled=enable_mtime)
+        )
+        return chain
 
-        expression = '(\d{8})_(\d{6})\.(mp[e]?g|mp4|3gp)$'
-        r = re.compile(expression)
-        if r.match(filename) is not None:
-            found = re.search(expression, filename)
-            y = int(found.group(1)[0:4])
-            m = int(found.group(1)[4:6])
-            d = int(found.group(1)[6:8])
-            h = int(found.group(2)[0:2])
-            min = int(found.group(2)[2:4])
-            s = int(found.group(2)[4:6])
-            extension = found.group(3)
-            return [datetime.datetime(y, m, d, h, min, s), extension]
+    def find_datetime(self) -> None:
+        result = self._chain.handle(self)
+        if result is not None:
+            self.date = result.date
+            self.extension = result.extension
+            self.found = True

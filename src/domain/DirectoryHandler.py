@@ -1,9 +1,9 @@
 import os
 
 from .Image import Image
-from .Video import Video
-from .MediaInterface import Media
 from .MediaHandler import MediaProvider
+from .MediaInterface import Media
+from .Video import Video
 
 
 class DirectoryHandler:
@@ -16,16 +16,16 @@ class DirectoryHandler:
     def __init__(self) -> None:
         pass
 
-    def media_files(self, srcDirectory) -> list[Media]:
-        self.filenames = os.listdir(srcDirectory)
+    def media_files(self, srcDirectory, enable_mtime: bool = False) -> list[Media]:
+        self.filenames = sorted(os.listdir(srcDirectory))
         mediafiles = []
 
         for f in self.filenames:
             source = os.path.join(srcDirectory, f)
             if MediaProvider.isImage(source):
-                mediafiles.append(Image(source))
+                mediafiles.append(Image(source, enable_mtime=enable_mtime))
             elif MediaProvider.isVideo(source):
-                mediafiles.append(Video(source))
+                mediafiles.append(Video(source, enable_mtime=enable_mtime))
 
         return mediafiles
 
