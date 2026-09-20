@@ -2,25 +2,26 @@ import argparse
 import os
 import re
 
-from domain.DirectoryHandler import DirectoryHandler
+from .domain.DirectoryHandler import DirectoryHandler
 
-# CONFIG
-srcDirectory = "../temp/src"
-
-# Set to True to preview the renames without touching any files.
-DRY_RUN = False
+# Default source directory, relative to this file. Override with the
+# positional ``src`` CLI argument.
+DEFAULT_SRC_DIRECTORY = "../work-directory"
 
 # APP
 
 
 class App:
     def __init__(self, src):
+        # Relative paths are resolved against this file's directory so the
+        # default (and any relative CLI value) behaves the same regardless of
+        # the current working directory. Absolute paths are used as-is.
         script_directory = os.path.dirname(os.path.abspath(__file__))
         self.src = os.path.join(script_directory, src)
         self.files = []
 
     def rename(self, dry_run: bool = False, enable_mtime: bool = False) -> None:
-        files = self.directoryHandler.media_files(self.src, enable_mtime=enable_mtime)
+        files = self.directory_handler.media_files(self.src, enable_mtime=enable_mtime)
 
         for file in files:
             new_name = file.new_name()
@@ -85,13 +86,28 @@ class App:
                 return suffixed
             counter += 1
 
-    def setDirectoryProvider(self, provider):
-        self.directoryHandler = provider
+    def set_directory_provider(self, provider):
+        self.directory_handler = provider
 
 
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(
         description="Rename media files to a standard, date-based name."
+    )
+    parser.add_argument(
+        "src",
+        nargs="?",
+        default=DEFAULT_SRC_DIRECTORY,
+        help=(
+            "Directory containing the media files to rename. Relative paths "
+            "are resolved against the app's location. "
+            f"Defaults to {DEFAULT_SRC_DIRECTORY!r}."
+        ),
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Preview the renames without touching any files.",
     )
     parser.add_argument(
         "--enable-modified",
@@ -103,10 +119,6 @@ def main(argv: list[str] | None = None) -> None:
     )
     args = parser.parse_args(argv)
 
-    app = App(srcDirectory)
-    app.setDirectoryProvider(DirectoryHandler())
-    app.rename(dry_run=DRY_RUN, enable_mtime=args.enable_modified)
-
-
-if __name__ == "__main__":
-    main()
+    app = App(args.src)
+    app.set_directory_provider(DirectoryHandler())
+    app.rename(dry_run=args.dry_run, enable_mtime=args.enable_modified)

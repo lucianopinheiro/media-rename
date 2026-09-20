@@ -12,13 +12,10 @@ except ImportError:  # pragma: no cover
 
 
 class MediaProvider:
-
     VIDEO_EXTENSIONS = (".mpg", ".mpeg", ".mp4", ".3gp", ".mov", ".avi", ".mkv")
 
-    def __init__(self) -> None:
-        pass
-
-    def isImage(filename):
+    @staticmethod
+    def is_image(filename):
         """Determine if the file is an image
 
         Args:
@@ -40,7 +37,8 @@ class MediaProvider:
         # Fallback when Pillow is unavailable: rely on the extension.
         return filename.lower().endswith((".jpg", ".jpeg", ".png", ".gif"))
 
-    def isVideo(filename):
+    @staticmethod
+    def is_video(filename):
         """Determine if the file is a video
 
         Args:
@@ -53,8 +51,8 @@ class MediaProvider:
         # Preferred: inspect container tracks with pymediainfo.
         if MediaInfo is not None:
             try:
-                fileInfo = MediaInfo.parse(filename)
-                for track in fileInfo.tracks:
+                file_info = MediaInfo.parse(filename)
+                for track in file_info.tracks:
                     if track.track_type == "Video":
                         return True
                 return False

@@ -64,16 +64,26 @@ With the virtual environment activated:
 
 ```bash
 cd src
-python App.py
+python App.py [src] [options]
 ```
 
-Files are renamed **in place** (in the same directory). Configure the source
-directory and the `DRY_RUN` flag at the top of `src/App.py`:
+Files are renamed **in place** (in the same directory).
 
-- `DRY_RUN = True` — preview only, prints `old ---> new` without touching files.
-- `DRY_RUN = False` — perform the renames.
+- `src` — optional directory containing the media files to rename. Relative
+  paths are resolved against the app's location. Defaults to
+  `../work-directory`.
+
+  ```bash
+  python App.py ~/Pictures/camera-roll
+  ```
 
 ### Options
+
+- `--dry-run` — preview only, prints `old ---> new` without touching any files.
+
+  ```bash
+  python App.py --dry-run
+  ```
 
 - `--enable-modified` — as a last resort, use the file's modified time (mtime)
   for files whose name carries no recognizable timestamp. Disabled by default,
