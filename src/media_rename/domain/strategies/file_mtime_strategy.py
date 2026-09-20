@@ -1,7 +1,7 @@
 import datetime
 import os
 
-from .DateStrategy import DateResult, DateStrategy
+from .date_strategy import DateResult, DateStrategy
 
 
 class FileMtimeStrategy(DateStrategy):

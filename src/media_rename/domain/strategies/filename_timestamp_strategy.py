@@ -1,7 +1,7 @@
 import datetime
 import re
 
-from .DateStrategy import DateResult, DateStrategy
+from .date_strategy import DateResult, DateStrategy
 
 
 class FilenameTimestampStrategy(DateStrategy):

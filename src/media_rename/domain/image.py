@@ -1,4 +1,4 @@
-from .MediaInterface import Media
+from .media_interface import Media
 from .strategies import (
     ExifDateStrategy,
     FileMtimeStrategy,

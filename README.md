@@ -60,11 +60,17 @@ ruff check --fix src/       # lint and auto-fix
 
 ## Run
 
-With the virtual environment activated:
+With the virtual environment activated, run the package from the project root:
 
 ```bash
-cd src
-python App.py [src] [options]
+python -m media_rename [src] [options]
+```
+
+Or install it (`pip install -e .`) to get the `media-rename` command, which
+works from any directory:
+
+```bash
+media-rename [src] [options]
 ```
 
 Files are renamed **in place** (in the same directory).
@@ -74,7 +80,7 @@ Files are renamed **in place** (in the same directory).
   `../work-directory`.
 
   ```bash
-  python App.py ~/Pictures/camera-roll
+  python -m media_rename ~/Pictures/camera-roll
   ```
 
 ### Options
@@ -82,7 +88,7 @@ Files are renamed **in place** (in the same directory).
 - `--dry-run` — preview only, prints `old ---> new` without touching any files.
 
   ```bash
-  python App.py --dry-run
+  python -m media_rename --dry-run
   ```
 
 - `--enable-modified` — as a last resort, use the file's modified time (mtime)
@@ -90,7 +96,7 @@ Files are renamed **in place** (in the same directory).
   since mtime is only reliable when it was preserved through copies/transfers.
 
   ```bash
-  python App.py --enable-modified
+  python -m media_rename --enable-modified
   ```
 
 ### Behavior

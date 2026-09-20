@@ -15,6 +15,19 @@ video = ["pymediainfo>=6.0"]
 # Tooling for development.
 dev = ["ruff>=0.6"]
 
+# Console entry point: after `pip install -e .` this exposes a `media-rename`
+# command that runs `app.main` from any working directory.
+[project.scripts]
+media-rename = "media_rename.app:main"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+# The importable package (`media_rename`) lives under the `src/` directory.
+where = ["src"]
+
 [tool.ruff]
 target-version = "py312"
 line-length = 88

@@ -1,7 +1,7 @@
 import datetime
 import re
 
-from .DateStrategy import DateResult, DateStrategy
+from .date_strategy import DateResult, DateStrategy
 
 
 class UnixTimestampStrategy(DateStrategy):
@@ -44,9 +44,9 @@ class UnixTimestampStrategy(DateStrategy):
             # Unix timestamps are UTC-based; interpret them as UTC. Drop the
             # tzinfo so the result is a naive datetime, consistent with the
             # sibling strategies and the strftime formatting in ``new_name``.
-            date = datetime.datetime.fromtimestamp(
-                epoch, tz=datetime.UTC
-            ).replace(tzinfo=None)
+            date = datetime.datetime.fromtimestamp(epoch, tz=datetime.UTC).replace(
+                tzinfo=None
+            )
         except (OverflowError, OSError, ValueError):
             return None
 

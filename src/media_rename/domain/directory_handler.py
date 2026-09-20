@@ -1,9 +1,9 @@
 import os
 
-from .Image import Image
-from .MediaHandler import MediaProvider
-from .MediaInterface import Media
-from .Video import Video
+from .image import Image
+from .media_handler import MediaProvider
+from .media_interface import Media
+from .video import Video
 
 
 class DirectoryHandler:

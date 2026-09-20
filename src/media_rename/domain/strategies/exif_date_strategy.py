@@ -1,7 +1,7 @@
 import datetime
 import os
 
-from .DateStrategy import DateResult, DateStrategy
+from .date_strategy import DateResult, DateStrategy
 
 try:
     from PIL import Image as PILImage
@@ -20,7 +20,7 @@ class ExifDateStrategy(DateStrategy):
     """
 
     # EXIF tag ids for the datetime fields.
-    _DATETIME = 0x0132          # DateTime (IFD0)
+    _DATETIME = 0x0132  # DateTime (IFD0)
     _DATETIME_ORIGINAL = 0x9003  # DateTimeOriginal (Exif IFD)
     _DATETIME_DIGITIZED = 0x9004  # DateTimeDigitized (Exif IFD)
 

@@ -2,11 +2,12 @@ import argparse
 import os
 import re
 
-from .domain.DirectoryHandler import DirectoryHandler
+from .domain.directory_handler import DirectoryHandler
 
-# Default source directory, relative to this file. Override with the
-# positional ``src`` CLI argument.
-DEFAULT_SRC_DIRECTORY = "../work-directory"
+# Default source directory, relative to this file. The package lives at
+# ``src/media_rename/``, so two levels up reaches the project root where
+# ``work-directory`` sits. Override with the positional ``src`` CLI argument.
+DEFAULT_SRC_DIRECTORY = "../../work-directory"
 
 # APP
 
