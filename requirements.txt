@@ -6,7 +6,7 @@
 #   pip install -r requirements.txt
 
 # Reading EXIF metadata from images (ExifDateStrategy).
-Pillow>=10.0
+Pillow>=13.0.0
 
 # Optional: richer video detection via libmediainfo.
 # Requires the native "libmediainfo" library to be installed on the system
